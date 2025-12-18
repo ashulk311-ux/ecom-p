@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import WishlistButton from '../components/WishlistButton';
+import Reviews from '../components/Reviews';
 import './RestaurantDetail.css';
 
 const RestaurantDetail = () => {
@@ -100,7 +102,13 @@ const RestaurantDetail = () => {
 
   return (
     <div className="restaurant-detail container">
-      <div className="restaurant-header">
+      <div className="restaurant-header" style={{ position: 'relative' }}>
+        <WishlistButton
+          itemId={restaurant._id}
+          itemType="restaurant"
+          name={restaurant.name}
+          image={restaurant.image}
+        />
         <h1>{restaurant.name}</h1>
         <p className="cuisine">{restaurant.cuisine}</p>
         <div className="restaurant-stats">
@@ -167,6 +175,8 @@ const RestaurantDetail = () => {
           </div>
         )}
       </div>
+
+      <Reviews type="restaurant" itemId={restaurant._id} />
     </div>
   );
 };

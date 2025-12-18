@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { FiCalendar } from 'react-icons/fi';
 import './Bookings.css';
 
 const Bookings = () => {
@@ -84,6 +86,16 @@ const Bookings = () => {
                   </div>
                 )}
               </div>
+              {booking.status !== 'cancelled' && (
+                <div className="booking-actions">
+                  <Link
+                    to={`/booking-tracking/${booking._id}`}
+                    className="btn-track"
+                  >
+                    <FiCalendar /> Track Booking
+                  </Link>
+                </div>
+              )}
             </div>
           ))
         )}

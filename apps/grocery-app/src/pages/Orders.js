@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { SkeletonList } from '../components/SkeletonLoader';
+import { EmptyOrders } from '../components/EmptyState';
+import ErrorMessage from '../components/ErrorMessage';
 import './Orders.css';
 
 const Orders = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('food');
@@ -37,7 +42,12 @@ const Orders = () => {
   };
 
   if (loading) {
-    return <div className="loading">Loading orders...</div>;
+    return (
+      <div className="orders container">
+        <h1>My Orders</h1>
+        <SkeletonList count={5} />
+      </div>
+    );
   }
 
   return (
@@ -60,9 +70,7 @@ const Orders = () => {
 
       <div className="orders-list">
         {orders.length === 0 ? (
-          <div className="no-orders">
-            <p>No orders found</p>
-          </div>
+          <EmptyOrders />
         ) : (
           orders.map(order => (
             <div key={order._id} className="order-card">
@@ -83,8 +91,8 @@ const Orders = () => {
               <div className="order-items">
                 {order.items.map((item, idx) => (
                   <div key={idx} className="order-item">
-                    <span>{item.name} x {item.quantity}</span>
-                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                    <span>{item.name} x <strong>{item.quantity}</strong></span>
+                    <span><strong>₹{(item.price * item.quantity).toFixed(2)}</strong></span>
                   </div>
                 ))}
               </div>
@@ -95,6 +103,16 @@ const Orders = () => {
                 <div className="order-total">
                   <strong>Total: ₹{order.totalAmount.toFixed(2)}</strong>
                 </div>
+                {order.status !== 'cancelled' && (
+                  <div className="order-actions">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => navigate(`/order-tracking/${order._id}`)}
+                    >
+                      Track Order
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))

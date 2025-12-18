@@ -1,0 +1,174 @@
+.order-tracking {
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.order-tracking h1 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.tracking-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.order-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #eee;
+}
+
+.order-status h2 {
+  margin: 0;
+  color: #333;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.pending {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.status-badge.confirmed {
+  background: #cfe2ff;
+  color: #084298;
+}
+
+.status-badge.preparing {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.out_for_delivery {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-badge.delivered {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.status-timeline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e0e0e0;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-item.completed .timeline-icon {
+  background: #28a745;
+  color: white;
+}
+
+.timeline-item.current .timeline-icon {
+  background: #007bff;
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+.timeline-item:not(.completed) .timeline-icon {
+  background: #e0e0e0;
+  color: #999;
+}
+
+.timeline-icon {
+  position: absolute;
+  left: -24px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  transition: all 0.3s;
+}
+
+.timeline-content h4 {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.timeline-content .timeline-note {
+  margin: 0;
+  color: #666;
+  font-size: 12px;
+}
+
+.delivery-info,
+.location-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 20px;
+  color: #333;
+}
+
+.delivery-person {
+  margin-top: 20px;
+  padding: 15px;
+  background: #e7f3ff;
+  border-radius: 8px;
+}
+
+.delivery-person h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.delivery-person p {
+  margin: 5px 0;
+  color: #666;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+  }
+}
+
+
+

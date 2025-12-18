@@ -110,9 +110,51 @@ router.get('/me', auth, async (req, res) => {
       email: req.user.email,
       role: req.user.role,
       phone: req.user.phone,
-      address: req.user.address
+      address: req.user.address,
+      createdAt: req.user.createdAt
     }
   });
+});
+
+// Update user profile
+router.put('/profile', auth, [
+  body('name').optional().notEmpty().withMessage('Name cannot be empty'),
+  body('phone').optional().notEmpty().withMessage('Phone cannot be empty')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, phone, address } = req.body;
+    const updates = {};
+    
+    if (name) updates.name = name;
+    if (phone) updates.phone = phone;
+    if (address !== undefined) updates.address = address;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      updates,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    res.json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+        address: user.address,
+        createdAt: user.createdAt
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 module.exports = router;

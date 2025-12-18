@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$SCRIPT_DIR" || exit 1
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -23,19 +27,21 @@ start_service() {
     local command=$4
     
     echo -e "${GREEN}Starting ${name}...${NC}"
-    cd "$dir"
+    cd "$SCRIPT_DIR/$dir" || exit 1
     if [ ! -d "node_modules" ]; then
         echo "Installing dependencies for ${name}..."
         npm install > /dev/null 2>&1
     fi
-    PORT=$port $command > /tmp/${name}.log 2>&1 &
+    export PORT=$port
+    $command > "/tmp/${name// /_}.log" 2>&1 &
     echo -e "${GREEN}✅ ${name} started on port ${port}${NC}"
     sleep 2
+    cd "$SCRIPT_DIR" || exit 1
 }
 
 # Start Backend
 echo -e "\n${BLUE}📦 Starting Backend...${NC}"
-cd backend
+cd "$SCRIPT_DIR/backend" || exit 1
 if [ ! -d "node_modules" ]; then
     echo "Installing backend dependencies..."
     npm install > /dev/null 2>&1
@@ -46,7 +52,7 @@ echo -e "${GREEN}✅ Backend started (PID: $BACKEND_PID)${NC}"
 sleep 3
 
 # Start Module Apps
-cd ..
+cd "$SCRIPT_DIR" || exit 1
 start_service "Food App" "apps/food-app" "3001" "npm start"
 start_service "Grocery App" "apps/grocery-app" "3002" "npm start"
 start_service "Services App" "apps/services-app" "3003" "npm start"

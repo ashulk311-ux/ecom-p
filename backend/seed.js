@@ -114,18 +114,23 @@ const seedData = async () => {
     }
     console.log('Sample restaurants created');
 
-    // Create sample grocery items
+    // Create sample grocery items with images
     const groceries = [
-      { name: 'Milk', category: 'Dairy', price: 50, unit: 'liter', stock: 100, description: 'Fresh whole milk' },
-      { name: 'Bread', category: 'Bakery', price: 30, unit: 'pack', stock: 50, description: 'White bread' },
-      { name: 'Eggs', category: 'Dairy', price: 60, unit: 'dozen', stock: 75, description: 'Farm fresh eggs' },
-      { name: 'Rice', category: 'Grains', price: 80, unit: 'kg', stock: 40, description: 'Basmati rice' },
-      { name: 'Tomatoes', category: 'Vegetables', price: 40, unit: 'kg', stock: 60, description: 'Fresh tomatoes' },
-      { name: 'Onions', category: 'Vegetables', price: 35, unit: 'kg', stock: 55, description: 'Fresh onions' },
-      { name: 'Potatoes', category: 'Vegetables', price: 30, unit: 'kg', stock: 70, description: 'Fresh potatoes' },
-      { name: 'Bananas', category: 'Fruits', price: 50, unit: 'kg', stock: 45, description: 'Fresh bananas' },
-      { name: 'Apples', category: 'Fruits', price: 120, unit: 'kg', stock: 35, description: 'Fresh red apples' },
-      { name: 'Chicken', category: 'Meat', price: 200, unit: 'kg', stock: 25, description: 'Fresh chicken' }
+      { name: 'Milk', category: 'Dairy', price: 50, unit: 'liter', stock: 100, description: 'Fresh whole milk', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&h=500&fit=crop' },
+      { name: 'Bread', category: 'Bakery', price: 30, unit: 'pack', stock: 50, description: 'White bread', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&h=500&fit=crop' },
+      { name: 'Eggs', category: 'Dairy', price: 60, unit: 'dozen', stock: 75, description: 'Farm fresh eggs', image: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=500&h=500&fit=crop' },
+      { name: 'Rice', category: 'Grains', price: 80, unit: 'kg', stock: 40, description: 'Basmati rice', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&h=500&fit=crop' },
+      { name: 'Tomatoes', category: 'Vegetables', price: 40, unit: 'kg', stock: 60, description: 'Fresh tomatoes', image: 'https://images.unsplash.com/photo-1546099665-68d4c2e8b5e1?w=500&h=500&fit=crop' },
+      { name: 'Onions', category: 'Vegetables', price: 35, unit: 'kg', stock: 55, description: 'Fresh onions', image: 'https://images.unsplash.com/photo-1618512496249-0e3c8a2e0c5a?w=500&h=500&fit=crop' },
+      { name: 'Potatoes', category: 'Vegetables', price: 30, unit: 'kg', stock: 70, description: 'Fresh potatoes', image: 'https://images.unsplash.com/photo-1518977822534-7049a61ee0c2?w=500&h=500&fit=crop' },
+      { name: 'Bananas', category: 'Fruits', price: 50, unit: 'kg', stock: 45, description: 'Fresh bananas', image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500&h=500&fit=crop' },
+      { name: 'Apples', category: 'Fruits', price: 120, unit: 'kg', stock: 35, description: 'Fresh red apples', image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b27c5a?w=500&h=500&fit=crop' },
+      { name: 'Chicken', category: 'Meat', price: 200, unit: 'kg', stock: 25, description: 'Fresh chicken', image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&h=500&fit=crop' },
+      { name: 'Yogurt', category: 'Dairy', price: 45, unit: 'pack', stock: 60, description: 'Plain yogurt', image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&h=500&fit=crop' },
+      { name: 'Cheese', category: 'Dairy', price: 150, unit: 'pack', stock: 30, description: 'Cheddar cheese', image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=500&h=500&fit=crop' },
+      { name: 'Butter', category: 'Dairy', price: 80, unit: 'pack', stock: 40, description: 'Salted butter', image: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=500&h=500&fit=crop' },
+      { name: 'Orange Juice', category: 'Beverages', price: 90, unit: 'liter', stock: 50, description: 'Fresh orange juice', image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=500&h=500&fit=crop' },
+      { name: 'Coffee', category: 'Beverages', price: 250, unit: 'pack', stock: 35, description: 'Ground coffee', image: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&h=500&fit=crop' }
     ];
 
     for (const grocery of groceries) {

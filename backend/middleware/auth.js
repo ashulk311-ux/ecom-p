@@ -26,7 +26,7 @@ const auth = async (req, res, next) => {
 const adminAuth = async (req, res, next) => {
   try {
     await auth(req, res, () => {
-      if (req.user.role !== 'admin') {
+      if (req.user.role !== 'admin' && req.user.role !== 'super_admin') {
         return res.status(403).json({ message: 'Access denied. Admin only.' });
       }
       next();
@@ -36,5 +36,18 @@ const adminAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { auth, adminAuth };
+const superAdminAuth = async (req, res, next) => {
+  try {
+    await auth(req, res, () => {
+      if (req.user.role !== 'super_admin') {
+        return res.status(403).json({ message: 'Access denied. Super admin only.' });
+      }
+      next();
+    });
+  } catch (error) {
+    res.status(401).json({ message: 'Authentication failed' });
+  }
+};
+
+module.exports = { auth, adminAuth, superAdminAuth };
 

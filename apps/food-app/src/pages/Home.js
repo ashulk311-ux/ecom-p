@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import SearchBar from '../components/SearchBar';
+import { SkeletonCard } from '../components/SkeletonLoader';
+import ErrorMessage from '../components/ErrorMessage';
+import { EmptySearch } from '../components/EmptyState';
 import './FoodDelivery.css';
 
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
+  const [allRestaurants, setAllRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchRestaurants();
@@ -15,6 +21,7 @@ const Home = () => {
   const fetchRestaurants = async () => {
     try {
       const res = await axios.get('/api/food/restaurants');
+      setAllRestaurants(res.data);
       setRestaurants(res.data);
       if (res.data.length === 0) {
         setError('No restaurants available at the moment.');
@@ -27,12 +34,38 @@ const Home = () => {
     }
   };
 
+  useEffect(() => {
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      const filtered = allRestaurants.filter(restaurant =>
+        restaurant.name.toLowerCase().includes(term) ||
+        restaurant.cuisine.toLowerCase().includes(term) ||
+        restaurant.description?.toLowerCase().includes(term)
+      );
+      setRestaurants(filtered);
+    } else {
+      setRestaurants(allRestaurants);
+    }
+  }, [searchTerm, allRestaurants]);
+
   if (loading) {
-    return <div className="loading">Loading restaurants...</div>;
+    return (
+      <div className="container">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '30px', marginTop: '30px' }}>
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="error-message">{error}</div>;
+    return (
+      <div className="container">
+        <ErrorMessage message={error} onRetry={fetchRestaurants} />
+      </div>
+    );
   }
 
   return (
@@ -41,6 +74,10 @@ const Home = () => {
         <h1>🍔 Food Delivery</h1>
         <p>Order from your favorite restaurants</p>
       </div>
+      <SearchBar 
+        onSearch={setSearchTerm} 
+        placeholder="Search restaurants..."
+      />
       <div className="restaurants-grid">
         {restaurants.map(restaurant => (
           <Link
@@ -69,10 +106,8 @@ const Home = () => {
           </Link>
         ))}
       </div>
-      {restaurants.length === 0 && (
-        <div className="no-results">
-          <p>No restaurants available at the moment.</p>
-        </div>
+      {restaurants.length === 0 && !loading && (
+        <EmptySearch searchTerm={searchTerm} />
       )}
     </div>
   );

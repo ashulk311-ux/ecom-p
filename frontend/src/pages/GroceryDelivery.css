@@ -48,6 +48,16 @@
 
 .items-section {
   flex: 1;
+  overflow: visible;
+  position: relative;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
+.items-section > * {
+  width: 100%;
+  max-width: 100%;
 }
 
 .items-grid {

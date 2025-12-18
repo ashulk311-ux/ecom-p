@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Module = require('../models/Module');
 const Order = require('../models/Order');
 const Booking = require('../models/Booking');
@@ -37,19 +38,41 @@ router.post('/init-modules', adminAuth, async (req, res) => {
 // Get all modules
 router.get('/modules', async (req, res) => {
   try {
-    const modules = await Module.find();
-    // If no modules exist, return empty array instead of error
-    res.json(modules || []);
-  } catch (error) {
-    console.error('Error fetching modules:', error);
-    // Return empty array if MongoDB is not connected
-    if (error.name === 'MongooseServerSelectionError' || error.message.includes('ECONNREFUSED')) {
+    // Check if mongoose is connected
+    if (mongoose.connection.readyState !== 1) {
+      console.error('MongoDB not connected. Connection state:', mongoose.connection.readyState);
       return res.status(503).json({ 
         message: 'Database not connected. Please set up MongoDB.',
         modules: [] 
       });
     }
-    res.status(500).json({ message: 'Server error', error: error.message });
+
+    const modules = await Module.find();
+    // If no modules exist, return empty array instead of error
+    res.json(modules || []);
+  } catch (error) {
+    console.error('Error fetching modules:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    
+    // Return empty array if MongoDB is not connected
+    if (error.name === 'MongooseServerSelectionError' || 
+        error.name === 'MongooseError' ||
+        error.message.includes('ECONNREFUSED') ||
+        error.message.includes('connection') ||
+        error.message.includes('MongoServerError')) {
+      return res.status(503).json({ 
+        message: 'Database not connected. Please set up MongoDB.',
+        modules: [] 
+      });
+    }
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: error.message,
+      errorName: error.name,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
@@ -96,6 +119,111 @@ router.get('/analytics', adminAuth, async (req, res) => {
 
     const revenue = (totalRevenue[0]?.total || 0) + (serviceRevenue[0]?.total || 0);
 
+    // Time-based analytics (last 7 days, 30 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Orders in last 7 days
+    const ordersLast7Days = await Order.countDocuments({
+      createdAt: { $gte: sevenDaysAgo }
+    });
+    const ordersLast30Days = await Order.countDocuments({
+      createdAt: { $gte: thirtyDaysAgo }
+    });
+
+    // Revenue in last 7 days
+    const revenueLast7Days = await Order.aggregate([
+      { 
+        $match: { 
+          paymentStatus: 'paid',
+          createdAt: { $gte: sevenDaysAgo }
+        } 
+      },
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]);
+
+    const bookingRevenueLast7Days = await Booking.aggregate([
+      { 
+        $match: { 
+          paymentStatus: 'paid',
+          createdAt: { $gte: sevenDaysAgo }
+        } 
+      },
+      { $group: { _id: null, total: { $sum: '$amount' } } }
+    ]);
+
+    const revenue7Days = (revenueLast7Days[0]?.total || 0) + (bookingRevenueLast7Days[0]?.total || 0);
+
+    // Daily revenue for last 7 days (for chart)
+    const dailyRevenue = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      const nextDate = new Date(date);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      const dayOrderRevenue = await Order.aggregate([
+        {
+          $match: {
+            paymentStatus: 'paid',
+            createdAt: { $gte: date, $lt: nextDate }
+          }
+        },
+        { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+      ]);
+
+      const dayBookingRevenue = await Booking.aggregate([
+        {
+          $match: {
+            paymentStatus: 'paid',
+            createdAt: { $gte: date, $lt: nextDate }
+          }
+        },
+        { $group: { _id: null, total: { $sum: '$amount' } } }
+      ]);
+
+      dailyRevenue.push({
+        date: date.toISOString().split('T')[0],
+        revenue: (dayOrderRevenue[0]?.total || 0) + (dayBookingRevenue[0]?.total || 0)
+      });
+    }
+
+    // Order status breakdown
+    const orderStatusBreakdown = await Order.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
+
+    // Top performing modules
+    const foodRevenue = await Order.aggregate([
+      { $match: { moduleType: 'food', paymentStatus: 'paid' } },
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]);
+    
+    const groceryRevenue = await Order.aggregate([
+      { $match: { moduleType: 'grocery', paymentStatus: 'paid' } },
+      { $group: { _id: null, total: { $sum: '$totalAmount' } } }
+    ]);
+
+    const modulePerf = [
+      { name: 'Food', orders: foodOrders, revenue: foodRevenue[0]?.total || 0 },
+      { name: 'Grocery', orders: groceryOrders, revenue: groceryRevenue[0]?.total || 0 },
+      { name: 'Services', orders: totalBookings, revenue: serviceRevenue[0]?.total || 0 }
+    ];
+
+    // Recent users (last 7 days)
+    const newUsersLast7Days = await User.countDocuments({
+      role: 'user',
+      createdAt: { $gte: sevenDaysAgo }
+    });
+
+    // Calculate growth rates
+    const orderGrowth = ordersLast30Days > 0 
+      ? ((ordersLast7Days / (ordersLast30Days - ordersLast7Days + ordersLast7Days)) * 100).toFixed(1)
+      : 0;
+
     res.json({
       totalUsers,
       totalOrders,
@@ -103,7 +231,26 @@ router.get('/analytics', adminAuth, async (req, res) => {
       foodOrders,
       groceryOrders,
       totalRevenue: revenue,
-      modules: await Module.find()
+      modules: await Module.find(),
+      // Enhanced analytics
+      trends: {
+        ordersLast7Days,
+        ordersLast30Days,
+        revenueLast7Days: revenue7Days,
+        newUsersLast7Days,
+        orderGrowth: parseFloat(orderGrowth)
+      },
+      dailyRevenue,
+      orderStatusBreakdown: orderStatusBreakdown.reduce((acc, item) => {
+        acc[item._id] = item.count;
+        return acc;
+      }, {}),
+      modulePerformance: modulePerf,
+      insights: {
+        avgOrderValue: totalOrders > 0 ? (revenue / totalOrders).toFixed(2) : 0,
+        conversionRate: totalUsers > 0 ? ((totalOrders / totalUsers) * 100).toFixed(2) : 0,
+        topModule: modulePerf.reduce((top, m) => m.revenue > (top?.revenue || 0) ? m : top, null)?.name || 'N/A'
+      }
     });
   } catch (error) {
     console.error(error);

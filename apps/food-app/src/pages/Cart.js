@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { EmptyCart } from '../components/EmptyState';
 import axios from 'axios';
 import './Cart.css';
 
@@ -8,6 +10,7 @@ const Cart = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { success, error: showError } = useToast();
   const [items, setItems] = useState([]);
   const [type, setType] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
@@ -35,6 +38,42 @@ const Cart = () => {
     return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
+  const updateQuantity = (index, newQuantity) => {
+    if (newQuantity < 1) {
+      removeItem(index);
+      return;
+    }
+    const updatedItems = [...items];
+    updatedItems[index].quantity = newQuantity;
+    setItems(updatedItems);
+    // Update localStorage
+    if (type) {
+      localStorage.setItem(`cart_${type}`, JSON.stringify(updatedItems));
+    }
+  };
+
+  const removeItem = (index) => {
+    const updatedItems = items.filter((_, i) => i !== index);
+    setItems(updatedItems);
+    // Update localStorage
+    if (type) {
+      localStorage.setItem(`cart_${type}`, JSON.stringify(updatedItems));
+    }
+    success('Item removed from cart');
+  };
+
+  const getSubtotal = () => {
+    return getTotal();
+  };
+
+  const getDeliveryFee = () => {
+    return 0; // Can be calculated based on distance
+  };
+
+  const getGrandTotal = () => {
+    return getSubtotal() + getDeliveryFee();
+  };
+
   const handleCheckout = async () => {
     if (!deliveryAddress) {
       setError('Please provide a delivery address');
@@ -58,10 +97,12 @@ const Cart = () => {
         localStorage.removeItem(`cart_food_${location.state.restaurantId}`);
       }
 
-      alert('Order placed successfully!');
+      success('Order placed successfully!');
       navigate('/orders');
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to place order');
+      const errorMsg = error.response?.data?.message || 'Failed to place order';
+      setError(errorMsg);
+      showError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -70,12 +111,7 @@ const Cart = () => {
   if (items.length === 0) {
     return (
       <div className="cart container">
-        <div className="empty-cart">
-          <h2>Your cart is empty</h2>
-          <button className="btn btn-primary" onClick={() => navigate('/')}>
-            Continue Shopping
-          </button>
-        </div>
+        <EmptyCart />
       </div>
     );
   }
@@ -90,15 +126,53 @@ const Cart = () => {
             <div key={idx} className="cart-item-card">
               <div className="cart-item-details">
                 <h3>{item.name}</h3>
-                <p>₹{item.price} x {item.quantity}</p>
+                <p><strong>₹{item.price}</strong> per item</p>
+                <div className="quantity-controls">
+                  <button 
+                    className="quantity-btn" 
+                    onClick={() => updateQuantity(idx, item.quantity - 1)}
+                    aria-label="Decrease quantity"
+                  >
+                    −
+                  </button>
+                  <span className="quantity-display">{item.quantity}</span>
+                  <button 
+                    className="quantity-btn" 
+                    onClick={() => updateQuantity(idx, item.quantity + 1)}
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                  <button 
+                    className="quantity-btn" 
+                    onClick={() => removeItem(idx)}
+                    style={{ marginLeft: 'auto', color: 'var(--danger-color)', borderColor: 'var(--danger-color)' }}
+                    aria-label="Remove item"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
               <div className="cart-item-total">
-                ₹{(item.price * item.quantity).toFixed(2)}
+                <strong>₹{(item.price * item.quantity).toFixed(2)}</strong>
               </div>
             </div>
           ))}
           <div className="cart-total-section">
-            <h2>Total: ₹{getTotal().toFixed(2)}</h2>
+            <div className="price-breakdown">
+              <div className="price-row">
+                <span>Subtotal</span>
+                <span>₹{getSubtotal().toFixed(2)}</span>
+              </div>
+              <div className="price-row">
+                <span>Delivery Fee</span>
+                <span>{getDeliveryFee() === 0 ? 'Free' : `₹${getDeliveryFee().toFixed(2)}`}</span>
+              </div>
+              <div className="price-row total">
+                <span>Total</span>
+                <span className="total-amount">₹{getGrandTotal().toFixed(2)}</span>
+              </div>
+            </div>
           </div>
         </div>
 

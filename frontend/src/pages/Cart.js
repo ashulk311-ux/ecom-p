@@ -12,6 +12,7 @@ const Cart = () => {
   const [type, setType] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [processPayment, setProcessPayment] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -51,6 +52,20 @@ const Cart = () => {
         deliveryAddress,
         paymentMethod
       });
+
+      // Process payment if not cash
+      if (processPayment && paymentMethod !== 'cash') {
+        try {
+          await axios.post('/api/payments/process', {
+            orderId: res.data._id,
+            amount: getTotal(),
+            paymentMethod
+          });
+        } catch (paymentError) {
+          console.error('Payment processing error:', paymentError);
+          // Order is still created, payment can be processed later
+        }
+      }
 
       // Clear cart
       localStorage.removeItem(`cart_${type}`);
@@ -117,11 +132,16 @@ const Cart = () => {
             <label>Payment Method</label>
             <select
               value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
+              onChange={(e) => {
+                setPaymentMethod(e.target.value);
+                setProcessPayment(e.target.value !== 'cash');
+              }}
             >
               <option value="cash">Cash on Delivery</option>
               <option value="card">Card</option>
               <option value="upi">UPI</option>
+              <option value="wallet">Wallet</option>
+              <option value="netbanking">Net Banking</option>
             </select>
           </div>
           <button

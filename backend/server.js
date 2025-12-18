@@ -30,9 +30,17 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ecommerce
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/admin/content', require('./routes/adminContent'));
+app.use('/api/super-admin', require('./routes/superAdmin'));
 app.use('/api/food', require('./routes/food'));
 app.use('/api/grocery', require('./routes/grocery'));
 app.use('/api/services', require('./routes/services'));
+app.use('/api/payments', require('./routes/payments'));
+app.use('/api/reviews', require('./routes/reviews'));
+app.use('/api/wishlist', require('./routes/wishlist'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/chat', require('./routes/chat'));
+app.use('/api/product-sections', require('./routes/productSections'));
 
 // Health check
 app.get('/api/health', (req, res) => {

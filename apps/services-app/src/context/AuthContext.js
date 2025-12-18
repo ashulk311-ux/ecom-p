@@ -48,9 +48,21 @@ export const AuthProvider = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       return { success: true };
     } catch (error) {
+      console.error('Login error:', error);
+      console.error('Error response:', error.response?.data);
+      
+      // Handle validation errors
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        const validationErrors = error.response.data.errors.map(err => err.msg || err.message).join(', ');
+        return {
+          success: false,
+          message: validationErrors || 'Validation error'
+        };
+      }
+      
       return {
         success: false,
-        message: error.response?.data?.message || 'Login failed'
+        message: error.response?.data?.message || error.message || 'Login failed'
       };
     }
   };
@@ -86,7 +98,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin'
+    isAdmin: user?.role === 'admin' || user?.role === 'super_admin'
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

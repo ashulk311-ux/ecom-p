@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import WishlistButton from '../components/WishlistButton';
+import Reviews from '../components/Reviews';
+import ProductSlider from '../components/ProductSlider';
 import './GroceryDelivery.css';
 
 const GroceryDelivery = () => {
@@ -13,11 +16,29 @@ const GroceryDelivery = () => {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [productSections, setProductSections] = useState([]);
+  const [userSections, setUserSections] = useState([]);
+  
+  // Get all product IDs from sections to exclude from main grid
+  const getSectionProductIds = () => {
+    const allSectionProducts = [
+      ...productSections.flatMap(section => section.products || []),
+      ...userSections.flatMap(section => section.products || [])
+    ];
+    return new Set(allSectionProducts.map(product => product._id));
+  };
 
   useEffect(() => {
     fetchData();
     loadCart();
+    fetchProductSections();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && cart.length > 0) {
+      fetchUserSections();
+    }
+  }, [isAuthenticated, cart]);
 
   useEffect(() => {
     fetchItems();
@@ -35,6 +56,41 @@ const GroceryDelivery = () => {
       setError(error.response?.data?.message || 'Failed to load grocery items');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchProductSections = async () => {
+    try {
+      const res = await axios.get('/api/product-sections/sections');
+      console.log('Product sections fetched:', res.data);
+      console.log('Number of sections:', res.data.length);
+      if (res.data.length > 0) {
+        console.log('First section:', res.data[0]);
+        console.log('First section products:', res.data[0].products?.length || 0);
+      }
+      setProductSections(res.data);
+    } catch (error) {
+      console.error('Error fetching product sections:', error);
+      console.error('Error response:', error.response);
+    }
+  };
+
+  const fetchUserSections = async () => {
+    try {
+      const cartItems = cart.map(item => ({ itemId: item.itemId }));
+      const token = localStorage.getItem('token');
+      const config = {
+        params: { cartItems: JSON.stringify(cartItems) }
+      };
+      
+      if (token) {
+        config.headers = { Authorization: `Bearer ${token}` };
+      }
+      
+      const res = await axios.get('/api/product-sections/sections/user', config);
+      setUserSections(res.data);
+    } catch (error) {
+      console.error('Error fetching user sections:', error);
     }
   };
 
@@ -131,10 +187,10 @@ const GroceryDelivery = () => {
 
   return (
     <div className="grocery-delivery container">
-      <div className="page-header">
+      {/* <div className="page-header">
         <h1>🛒 Grocery Delivery</h1>
         <p>Get your groceries delivered in minutes</p>
-      </div>
+      </div> */}
 
       <div className="grocery-content">
         <div className="categories-sidebar">
@@ -156,10 +212,79 @@ const GroceryDelivery = () => {
           ))}
         </div>
 
-        <div className="items-section">
+        <div className="items-section" style={{ width: '100%', maxWidth: '100%', overflow: 'visible' }}>
+          {/* Debug info */}
+          {process.env.NODE_ENV === 'development' && (
+            <div style={{ padding: '10px', background: '#f0f0f0', marginBottom: '10px', borderRadius: '4px', fontSize: '12px' }}>
+              <strong>Debug:</strong> Sections: {productSections.length}, User Sections: {userSections.length}
+              {productSections.length > 0 && (
+                <div style={{ marginTop: '5px' }}>
+                  {productSections.map(s => (
+                    <div key={s._id}>- {s.displayName}: {s.products?.length || 0} products</div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Product Sections from Backend */}
+          {productSections.length > 0 ? (
+            productSections.map(section => {
+              const sectionProducts = section.products || [];
+              if (sectionProducts.length === 0) {
+                return null;
+              }
+              return (
+                <ProductSlider
+                  key={section._id}
+                  title={section.displayName}
+                  icon={section.icon}
+                  description={section.description}
+                  items={sectionProducts}
+                  onAddToCart={addToCart}
+                />
+              );
+            })
+          ) : (
+            <div style={{ padding: '20px', textAlign: 'center', color: '#666', background: '#f8f9fa', borderRadius: '8px', marginBottom: '20px' }}>
+              Loading product sections...
+            </div>
+          )}
+
+          {/* User-specific sections */}
+          {userSections.length > 0 && userSections.map(section => {
+            const sectionProducts = section.products || [];
+            if (sectionProducts.length === 0) {
+              return null;
+            }
+            return (
+              <ProductSlider
+                key={section._id}
+                title={section.displayName}
+                icon={section.icon}
+                description={section.description}
+                items={sectionProducts}
+                onAddToCart={addToCart}
+              />
+            );
+          })}
+
           <div className="items-grid">
-            {items.map(item => (
-              <div key={item._id} className="grocery-item-card">
+            {items
+              .filter(item => {
+                // Exclude items that are already in any section slider
+                const sectionProductIds = getSectionProductIds();
+                return !sectionProductIds.has(item._id);
+              })
+              .map(item => (
+              <div key={item._id} className="grocery-item-card" style={{ position: 'relative' }}>
+                <WishlistButton
+                  itemId={item._id}
+                  itemType="product"
+                  name={item.name}
+                  image={item.image}
+                  price={item.price}
+                />
                 <div className="item-image">
                   {item.image ? (
                     <img src={item.image} alt={item.name} />

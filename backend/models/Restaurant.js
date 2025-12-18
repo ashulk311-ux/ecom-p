@@ -21,6 +21,27 @@ const menuItemSchema = new mongoose.Schema({
     type: String,
     default: 'General'
   },
+  discount: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
+  discountAmount: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  quantity: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
+  stock: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
   isAvailable: {
     type: Boolean,
     default: true
@@ -57,6 +78,17 @@ const restaurantSchema = new mongoose.Schema({
   deliveryFee: {
     type: Number,
     default: 0
+  },
+  discount: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
+  discountAmount: {
+    type: Number,
+    default: 0,
+    min: 0
   },
   menu: [menuItemSchema],
   isActive: {

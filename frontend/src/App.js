@@ -13,8 +13,15 @@ import RestaurantDetail from './pages/RestaurantDetail';
 import Cart from './pages/Cart';
 import Orders from './pages/Orders';
 import Bookings from './pages/Bookings';
+import PaymentHistory from './pages/PaymentHistory';
+import OrderTracking from './pages/OrderTracking';
+import BookingTracking from './pages/BookingTracking';
+import Wishlist from './pages/Wishlist';
+import Chat from './pages/Chat';
 import PrivateRoute from './components/PrivateRoute';
 import AdminRoute from './components/AdminRoute';
+import SuperAdminRoute from './components/SuperAdminRoute';
+import SuperAdminPanel from './pages/SuperAdminPanel';
 
 function App() {
   return (
@@ -55,11 +62,59 @@ function App() {
               }
             />
             <Route
+              path="/payment-history"
+              element={
+                <PrivateRoute>
+                  <PaymentHistory />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/order-tracking/:id"
+              element={
+                <PrivateRoute>
+                  <OrderTracking />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/booking-tracking/:id"
+              element={
+                <PrivateRoute>
+                  <BookingTracking />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/wishlist"
+              element={
+                <PrivateRoute>
+                  <Wishlist />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <PrivateRoute>
+                  <Chat />
+                </PrivateRoute>
+              }
+            />
+            <Route
               path="/admin"
               element={
                 <AdminRoute>
                   <AdminPanel />
                 </AdminRoute>
+              }
+            />
+            <Route
+              path="/super-admin"
+              element={
+                <SuperAdminRoute>
+                  <SuperAdminPanel />
+                </SuperAdminRoute>
               }
             />
             <Route path="*" element={<Navigate to="/" replace />} />

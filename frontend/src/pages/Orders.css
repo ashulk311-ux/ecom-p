@@ -94,10 +94,33 @@
   font-size: 14px;
 }
 
+.order-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
 .order-total {
-  text-align: right;
   font-size: 18px;
   color: #333;
+}
+
+.btn-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.btn-track:hover {
+  background: #0056b3;
 }
 
 .no-orders {

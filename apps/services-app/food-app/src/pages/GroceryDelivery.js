@@ -131,10 +131,10 @@ const GroceryDelivery = () => {
 
   return (
     <div className="grocery-delivery container">
-      <div className="page-header">
+      {/* <div className="page-header">
         <h1>🛒 Grocery Delivery</h1>
         <p>Get your groceries delivered in minutes</p>
-      </div>
+      </div> */}
 
       <div className="grocery-content">
         <div className="categories-sidebar">

@@ -3,36 +3,81 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(29, 78, 216, 0.02) 100%);
 }
 
 .auth-card {
-  background: white;
-  border-radius: 8px;
-  padding: 40px;
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 48px 40px;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  max-width: 450px;
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
 }
 
 .auth-card h2 {
   text-align: center;
-  margin-bottom: 30px;
-  color: #333;
+  margin-bottom: 36px;
+  color: var(--text-primary);
+  font-size: 32px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.input-group {
+  margin-bottom: 24px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  background: var(--surface);
+  color: var(--text-primary);
+  transition: all 0.3s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .auth-link {
   text-align: center;
-  margin-top: 20px;
-  color: #666;
+  margin-top: 24px;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .auth-link a {
-  color: #007bff;
+  color: var(--primary-color);
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
 }
 
 .auth-link a:hover {
+  color: var(--primary-hover);
   text-decoration: underline;
 }
 

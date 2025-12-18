@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { FiPackage } from 'react-icons/fi';
 import './Orders.css';
 
 const Orders = () => {
@@ -92,8 +94,18 @@ const Orders = () => {
                 <div className="order-address">
                   <strong>Delivery Address:</strong> {order.deliveryAddress}
                 </div>
-                <div className="order-total">
-                  <strong>Total: ₹{order.totalAmount.toFixed(2)}</strong>
+                <div className="order-actions">
+                  <div className="order-total">
+                    <strong>Total: ₹{order.totalAmount.toFixed(2)}</strong>
+                  </div>
+                  {order.status !== 'cancelled' && (
+                    <Link
+                      to={`/order-tracking/${order._id}`}
+                      className="btn-track"
+                    >
+                      <FiPackage /> Track Order
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

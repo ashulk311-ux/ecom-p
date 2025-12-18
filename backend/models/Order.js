@@ -54,6 +54,27 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: 'cash'
   },
+  paymentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Payment'
+  },
+  tracking: {
+    currentLocation: {
+      type: String
+    },
+    estimatedDelivery: {
+      type: Date
+    },
+    deliveryPerson: {
+      name: String,
+      phone: String
+    },
+    statusHistory: [{
+      status: String,
+      timestamp: Date,
+      note: String
+    }]
+  },
   createdAt: {
     type: Date,
     default: Date.now

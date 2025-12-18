@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '../context/ToastContext';
 import axios from 'axios';
 import './GroceryDelivery.css';
 
 const GroceryDelivery = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { warning } = useToast();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -64,7 +66,7 @@ const GroceryDelivery = () => {
 
   const addToCart = (item) => {
     if (item.stock <= 0) {
-      alert('Item is out of stock');
+      warning('Item is out of stock');
       return;
     }
 
@@ -73,7 +75,7 @@ const GroceryDelivery = () => {
 
     if (existingItem) {
       if (existingItem.quantity >= item.stock) {
-        alert('Insufficient stock');
+        warning('Insufficient stock');
         return;
       }
       newCart = cart.map(c =>
@@ -131,10 +133,10 @@ const GroceryDelivery = () => {
 
   return (
     <div className="grocery-delivery container">
-      <div className="page-header">
+      {/* <div className="page-header">
         <h1>🛒 Grocery Delivery</h1>
         <p>Get your groceries delivered in minutes</p>
-      </div>
+      </div> */}
 
       <div className="grocery-content">
         <div className="categories-sidebar">
@@ -174,7 +176,7 @@ const GroceryDelivery = () => {
                     <span className="price">₹{item.price}</span>
                     <span className="unit">/{item.unit}</span>
                     {item.stock > 0 ? (
-                      <span className="stock">In Stock ({item.stock})</span>
+                      <span className="stock">In Stock (<strong>{item.stock}</strong>)</span>
                     ) : (
                       <span className="out-of-stock">Out of Stock</span>
                     )}
@@ -201,11 +203,11 @@ const GroceryDelivery = () => {
                 <div key={item.itemId} className="cart-item">
                   <div className="cart-item-info">
                     <span>{item.name}</span>
-                    <span>₹{item.price} x {item.quantity}</span>
+                    <span><strong>₹{item.price}</strong> x <strong>{item.quantity}</strong></span>
                   </div>
                   <div className="cart-item-controls">
                     <button onClick={() => updateQuantity(item.itemId, item.quantity - 1)}>-</button>
-                    <span>{item.quantity}</span>
+                    <span><strong>{item.quantity}</strong></span>
                     <button onClick={() => updateQuantity(item.itemId, item.quantity + 1)}>+</button>
                   </div>
                 </div>

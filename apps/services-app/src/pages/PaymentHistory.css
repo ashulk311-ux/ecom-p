@@ -1,0 +1,151 @@
+.payment-history {
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.payment-history h1 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.payments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.payment-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.payment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.payment-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.payment-icon {
+  font-size: 32px;
+  color: #007bff;
+}
+
+.payment-info h3 {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+}
+
+.payment-method {
+  color: #666;
+  font-size: 14px;
+  margin: 5px 0 0 0;
+}
+
+.payment-status {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.status-icon {
+  font-size: 24px;
+}
+
+.status-icon.completed {
+  color: #28a745;
+}
+
+.status-icon.failed {
+  color: #dc3545;
+}
+
+.status-icon.refunded {
+  color: #ffc107;
+}
+
+.status-icon.pending {
+  color: #6c757d;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.failed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.refunded,
+.status-badge.partially_refunded {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.pending {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.payment-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.detail-row span:first-child {
+  color: #666;
+  font-weight: 500;
+}
+
+.transaction-id {
+  font-family: monospace;
+  color: #007bff;
+}
+
+.refund-info {
+  color: #856404;
+  font-weight: 600;
+}
+
+.refund-amount {
+  color: #ffc107;
+  font-weight: 700;
+}
+
+.no-payments {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+

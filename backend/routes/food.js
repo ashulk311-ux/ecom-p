@@ -105,10 +105,9 @@ router.get('/orders/:id', auth, checkModuleActive, async (req, res) => {
   }
 });
 
-// Update order status (for tracking)
-router.put('/orders/:id/status', auth, checkModuleActive, async (req, res) => {
+// Get order tracking
+router.get('/orders/:id/tracking', auth, checkModuleActive, async (req, res) => {
   try {
-    const { status } = req.body;
     const order = await Order.findOne({
       _id: req.params.id,
       userId: req.user._id
@@ -118,13 +117,72 @@ router.put('/orders/:id/status', auth, checkModuleActive, async (req, res) => {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    order.status = status;
-    if (status === 'delivered') {
-      order.deliveredAt = new Date();
-      order.paymentStatus = 'paid';
+    res.json({
+      orderId: order._id,
+      status: order.status,
+      tracking: order.tracking || {},
+      estimatedDelivery: order.tracking?.estimatedDelivery,
+      currentLocation: order.tracking?.currentLocation,
+      deliveryPerson: order.tracking?.deliveryPerson,
+      statusHistory: order.tracking?.statusHistory || []
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update order status (for tracking) - Admin only
+router.put('/orders/:id/status', auth, checkModuleActive, async (req, res) => {
+  try {
+    const { status, note, currentLocation, estimatedDelivery, deliveryPerson } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
     }
 
+    // Check if user is admin or order owner
+    if (order.userId.toString() !== req.user._id.toString() && req.user.role !== 'admin' && req.user.role !== 'super_admin') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const oldStatus = order.status;
+    order.status = status;
+    
+    if (status === 'delivered') {
+      order.deliveredAt = new Date();
+      if (order.paymentStatus === 'pending') {
+        order.paymentStatus = 'paid';
+      }
+    }
+
+    // Update tracking
+    if (!order.tracking) {
+      order.tracking = { statusHistory: [] };
+    }
+    
+    order.tracking.statusHistory.push({
+      status,
+      timestamp: new Date(),
+      note: note || ''
+    });
+
+    if (currentLocation) order.tracking.currentLocation = currentLocation;
+    if (estimatedDelivery) order.tracking.estimatedDelivery = estimatedDelivery;
+    if (deliveryPerson) order.tracking.deliveryPerson = deliveryPerson;
+
     await order.save();
+
+    // Create notification if status changed
+    if (oldStatus !== status) {
+      const { notifyOrderStatus } = require('../utils/notifications');
+      await notifyOrderStatus(order.userId, order._id, status, {
+        orderNumber: order._id,
+        totalAmount: order.totalAmount
+      });
+    }
+
     res.json(order);
   } catch (error) {
     console.error(error);

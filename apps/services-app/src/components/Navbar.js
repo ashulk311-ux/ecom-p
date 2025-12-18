@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import './Navbar.css';
@@ -7,6 +7,7 @@ import './Navbar.css';
 const Navbar = () => {
   const { user, logout, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [modules, setModules] = useState([]);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const Navbar = () => {
   };
 
   const activeModules = getActiveModules();
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
     <nav className="navbar">
@@ -40,7 +42,7 @@ const Navbar = () => {
           Ecommerce App
         </Link>
         <div className="navbar-menu">
-          {activeModules.map(module => (
+          {!isAdmin && !isAdminPage && activeModules.map(module => (
             <Link
               key={module.name}
               to={`/${module.name === 'food' ? 'food' : module.name === 'grocery' ? 'grocery' : 'services'}`}
@@ -51,8 +53,11 @@ const Navbar = () => {
           ))}
           {isAuthenticated && (
             <>
-              <Link to="/orders" className="navbar-link">My Orders</Link>
               <Link to="/bookings" className="navbar-link">My Bookings</Link>
+              <Link to="/wishlist" className="navbar-link">Wishlist</Link>
+              <Link to="/chat" className="navbar-link">Chat</Link>
+              <Link to="/payment-history" className="navbar-link">Payments</Link>
+              <Link to="/profile" className="navbar-link">Profile</Link>
             </>
           )}
           {isAdmin && (

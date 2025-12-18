@@ -54,6 +54,23 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     default: 'cash'
   },
+  paymentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Payment'
+  },
+  tracking: {
+    providerLocation: {
+      type: String
+    },
+    estimatedArrival: {
+      type: Date
+    },
+    statusHistory: [{
+      status: String,
+      timestamp: Date,
+      note: String
+    }]
+  },
   feedback: {
     rating: {
       type: Number,

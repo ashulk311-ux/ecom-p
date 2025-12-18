@@ -139,6 +139,34 @@ router.get('/orders/:id', auth, checkModuleActive, async (req, res) => {
   }
 });
 
+// Get order tracking
+router.get('/orders/:id/tracking', auth, checkModuleActive, async (req, res) => {
+  try {
+    const order = await Order.findOne({
+      _id: req.params.id,
+      userId: req.user._id,
+      moduleType: 'grocery'
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json({
+      orderId: order._id,
+      status: order.status,
+      tracking: order.tracking || {},
+      estimatedDelivery: order.tracking?.estimatedDelivery,
+      currentLocation: order.tracking?.currentLocation,
+      deliveryPerson: order.tracking?.deliveryPerson,
+      statusHistory: order.tracking?.statusHistory || []
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Update order status
 router.put('/orders/:id/status', auth, checkModuleActive, async (req, res) => {
   try {

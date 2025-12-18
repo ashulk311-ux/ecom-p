@@ -72,7 +72,7 @@ const Bookings = () => {
                   <strong>Address:</strong> {booking.address}
                 </div>
                 <div className="booking-detail-item">
-                  <strong>Amount:</strong> ₹{booking.amount.toFixed(2)}
+                  <strong>Amount:</strong> <strong>₹{booking.amount.toFixed(2)}</strong>
                 </div>
                 {booking.feedback && (
                   <div className="booking-feedback">

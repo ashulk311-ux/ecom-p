@@ -29,6 +29,23 @@ const groceryItemSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  rating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5
+  },
+  discount: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
+  },
+  discountAmount: {
+    type: Number,
+    default: 0,
+    min: 0
+  },
   isAvailable: {
     type: Boolean,
     default: true

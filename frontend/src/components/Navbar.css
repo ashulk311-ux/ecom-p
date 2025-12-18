@@ -50,6 +50,50 @@
   color: #666;
 }
 
+.notifications-wrapper {
+  position: relative;
+}
+
+.notification-bell {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #333;
+  cursor: pointer;
+  position: relative;
+  padding: 5px;
+  transition: color 0.3s;
+}
+
+.notification-bell:hover {
+  color: #007bff;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 10px;
+  z-index: 1000;
+  min-width: 400px;
+}
+
 @media (max-width: 768px) {
   .navbar-container {
     flex-direction: column;
@@ -59,6 +103,11 @@
   .navbar-menu {
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  .notifications-dropdown {
+    right: -100px;
+    min-width: 300px;
   }
 }
 
